@@ -1,0 +1,52 @@
+[project]
+name = "python-mastery"
+version = "0.1.0"
+description = "Evidence-based Python learning repository from foundations through CPython internals."
+readme = "README.md"
+requires-python = ">=3.11,<3.15"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.python-mastery]
+canonical-python = "3.14"
+interview-compatibility-python = "3.11"
+recommended-dev-tools = [
+    "pytest",
+    "ruff",
+    "mypy",
+    "hypothesis",
+    "coverage",
+    "pyperf",
+]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-config --strict-markers"
+python_files = ["test_*.py", "*_test.py"]
+testpaths = ["units", "projects"]
+
+[tool.coverage.run]
+branch = true
+source = ["units", "projects"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+show_error_codes = true
+warn_unreachable = true
