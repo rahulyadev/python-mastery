@@ -146,7 +146,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | `PY-TST-070` | [Formatting, linting, static analysis, and maintainability](CURRICULUM.md#py-tst-070) | Core | Absent | Not started | — | — | — | — |
 | `PY-CON-010` | [Concurrency, parallelism, scheduling, and the GIL model](CURRICULUM.md#py-con-010) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-010-concurrency-parallelism-scheduling-and-the-gil-model/README.md) |
 | `PY-CON-020` | [Threads, lifecycle, context, and thread-safe boundaries](CURRICULUM.md#py-con-020) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-020-threads-lifecycle-context-and-thread-safe-boundaries/README.md) |
-| `PY-CON-030` | [Synchronization, queues, races, and deadlocks](CURRICULUM.md#py-con-030) | Core | Absent | Not started | — | — | — | — |
+| `PY-CON-030` | [Synchronization, queues, races, and deadlocks](CURRICULUM.md#py-con-030) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-030-synchronization-queues-races-and-deadlocks/README.md) |
 | `PY-CON-040` | [Multiprocessing, IPC, shared memory, and process isolation](CURRICULUM.md#py-con-040) | Professional | Absent | Not started | — | — | — | — |
 | `PY-CON-050` | [Futures and executors](CURRICULUM.md#py-con-050) | Core | Absent | Not started | — | — | — | — |
 | `PY-CON-060` | [Asyncio event loop, coroutines, tasks, and context](CURRICULUM.md#py-con-060) | Core | Absent | Not started | — | — | — | — |
