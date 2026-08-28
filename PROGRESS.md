@@ -150,7 +150,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | `PY-CON-040` | [Multiprocessing, IPC, shared memory, and process isolation](CURRICULUM.md#py-con-040) | Professional | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-040-multiprocessing-ipc-shared-memory-and-process-isolation/README.md) |
 | `PY-CON-050` | [Futures and executors](CURRICULUM.md#py-con-050) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-050-futures-and-executors/README.md) |
 | `PY-CON-060` | [Asyncio event loop, coroutines, tasks, and context](CURRICULUM.md#py-con-060) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-060-asyncio-event-loop-coroutines-tasks-and-context/README.md) |
-| `PY-CON-070` | [Structured concurrency, cancellation, and timeouts](CURRICULUM.md#py-con-070) | Core | Absent | Not started | — | — | — | — |
+| `PY-CON-070` | [Structured concurrency, cancellation, and timeouts](CURRICULUM.md#py-con-070) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-070-structured-concurrency-cancellation-and-timeouts/README.md) |
 | `PY-CON-080` | [Async queues, backpressure, async iteration, and blocking boundaries](CURRICULUM.md#py-con-080) | Core | Absent | Not started | — | — | — | — |
 | `PY-CON-090` | [Free-threaded CPython, subinterpreters, and version-specific GIL changes](CURRICULUM.md#py-con-090) | Advanced | Absent | Not started | — | — | — | — |
 | `PY-MPR-010` | [Object lifetime, reference counting, finalization, and weak references](CURRICULUM.md#py-mpr-010) | Core | Absent | Not started | — | — | — | — |
