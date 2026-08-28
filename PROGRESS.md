@@ -69,7 +69,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | Unit ID | Title | Priority | Artifact state | Learning state | Last evidence | Next review | Weakest point | Evidence link |
 |---|---|---|---|---|---|---|---|---|
 | `PY-FND-010` | [Python syntax and execution](CURRICULUM.md#py-fnd-010) | Core | Draft | Not started | — | — | — | [Unit note](units/foundations/PY-FND-010-python-syntax-and-execution/README.md) |
-| `PY-FND-020` | [Objects, names, references, and mutability](CURRICULUM.md#py-fnd-020) | Core | Absent | Not started | — | — | — | — |
+| `PY-FND-020` | [Objects, names, references, and mutability](CURRICULUM.md#py-fnd-020) | Core | Draft | Not started | — | — | — | [Unit note](units/foundations/PY-FND-020-objects-names-references-and-mutability/README.md) |
 | `PY-FND-030` | [Namespaces, scope, and name resolution](CURRICULUM.md#py-fnd-030) | Core | Absent | Not started | — | — | — | — |
 | `PY-FND-040` | [Expressions, evaluation order, and operators](CURRICULUM.md#py-fnd-040) | Core | Absent | Not started | — | — | — | — |
 | `PY-FND-050` | [Truthiness, comparisons, equality, and identity](CURRICULUM.md#py-fnd-050) | Core | Absent | Not started | — | — | — | — |
