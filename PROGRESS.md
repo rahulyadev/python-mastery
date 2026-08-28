@@ -152,7 +152,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | `PY-CON-060` | [Asyncio event loop, coroutines, tasks, and context](CURRICULUM.md#py-con-060) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-060-asyncio-event-loop-coroutines-tasks-and-context/README.md) |
 | `PY-CON-070` | [Structured concurrency, cancellation, and timeouts](CURRICULUM.md#py-con-070) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-070-structured-concurrency-cancellation-and-timeouts/README.md) |
 | `PY-CON-080` | [Async queues, backpressure, async iteration, and blocking boundaries](CURRICULUM.md#py-con-080) | Core | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-080-async-queues-backpressure-async-iteration-and-blocking-boundaries/README.md) |
-| `PY-CON-090` | [Free-threaded CPython, subinterpreters, and version-specific GIL changes](CURRICULUM.md#py-con-090) | Advanced | Absent | Not started | — | — | — | — |
+| `PY-CON-090` | [Free-threaded CPython, subinterpreters, and version-specific GIL changes](CURRICULUM.md#py-con-090) | Advanced | Draft | Not started | — | — | — | [Unit note](units/concurrency/PY-CON-090-free-threaded-cpython-subinterpreters-and-version-specific-gil-changes/README.md) |
 | `PY-MPR-010` | [Object lifetime, reference counting, finalization, and weak references](CURRICULUM.md#py-mpr-010) | Core | Absent | Not started | — | — | — | — |
 | `PY-MPR-020` | [Cyclic garbage collection and gc inspection](CURRICULUM.md#py-mpr-020) | Professional | Absent | Not started | — | — | — | — |
 | `PY-MPR-030` | [Stack, frame, heap, call, and local-variable mental models](CURRICULUM.md#py-mpr-030) | Core | Absent | Not started | — | — | — | — |
