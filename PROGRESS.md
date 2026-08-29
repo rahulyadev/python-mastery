@@ -73,7 +73,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | `PY-FND-030` | [Namespaces, scope, and name resolution](CURRICULUM.md#py-fnd-030) | Core | Approved | Not started | — | — | — | [Unit note](units/foundations/PY-FND-030-namespaces-scope-and-name-resolution/README.md) |
 | `PY-FND-040` | [Expressions, evaluation order, and operators](CURRICULUM.md#py-fnd-040) | Core | Approved | Not started | — | — | — | [Unit note](units/foundations/PY-FND-040-expressions-evaluation-order-and-operators/README.md) |
 | `PY-FND-050` | [Truthiness, comparisons, equality, and identity](CURRICULUM.md#py-fnd-050) | Core | Approved | Not started | — | — | — | [Unit note](units/foundations/PY-FND-050-truthiness-comparisons-equality-and-identity/README.md) |
-| `PY-FND-060` | [Control flow and structural pattern matching](CURRICULUM.md#py-fnd-060) | Core | Absent | Not started | — | — | — | — |
+| `PY-FND-060` | [Control flow and structural pattern matching](CURRICULUM.md#py-fnd-060) | Core | Draft | Not started | — | — | — | [Unit note](units/foundations/PY-FND-060-control-flow-and-structural-pattern-matching/README.md) |
 | `PY-BLT-010` | [Numbers, booleans, and None](CURRICULUM.md#py-blt-010) | Core | Absent | Not started | — | — | — | — |
 | `PY-BLT-020` | [Strings and Unicode](CURRICULUM.md#py-blt-020) | Core | Absent | Not started | — | — | — | — |
 | `PY-BLT-030` | [Bytes, bytearray, memoryview, and the buffer model](CURRICULUM.md#py-blt-030) | Professional | Absent | Not started | — | — | — | — |
