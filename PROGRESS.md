@@ -75,7 +75,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | `PY-FND-050` | [Truthiness, comparisons, equality, and identity](CURRICULUM.md#py-fnd-050) | Core | Approved | Not started | — | — | — | [Unit note](units/foundations/PY-FND-050-truthiness-comparisons-equality-and-identity/README.md) |
 | `PY-FND-060` | [Control flow and structural pattern matching](CURRICULUM.md#py-fnd-060) | Core | Approved | Not started | — | — | — | [Unit note](units/foundations/PY-FND-060-control-flow-and-structural-pattern-matching/README.md) |
 | `PY-BLT-010` | [Numbers, booleans, and None](CURRICULUM.md#py-blt-010) | Core | Approved | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-010-numbers-booleans-and-none/README.md) |
-| `PY-BLT-020` | [Strings and Unicode](CURRICULUM.md#py-blt-020) | Core | Draft | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-020-strings-and-unicode/README.md) |
+| `PY-BLT-020` | [Strings and Unicode](CURRICULUM.md#py-blt-020) | Core | Approved | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-020-strings-and-unicode/README.md) |
 | `PY-BLT-030` | [Bytes, bytearray, memoryview, and the buffer model](CURRICULUM.md#py-blt-030) | Professional | Absent | Not started | — | — | — | — |
 | `PY-BLT-040` | [Lists, tuples, ranges, and sequence behaviour](CURRICULUM.md#py-blt-040) | Core | Absent | Not started | — | — | — | — |
 | `PY-BLT-050` | [Dictionaries and mapping behaviour](CURRICULUM.md#py-blt-050) | Core | Absent | Not started | — | — | — | — |
