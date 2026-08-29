@@ -120,7 +120,7 @@ Expected reasoning:
 | Interview compatibility | Python 3.11 |
 | Initially tested runtime | CPython 3.14.4 on Linux x86_64 |
 | Last source audit | 2026-08-29 |
-| Artifact state | Draft |
+| Artifact state | Approved |
 
 ## 1. Learning outcome and evidence
 
