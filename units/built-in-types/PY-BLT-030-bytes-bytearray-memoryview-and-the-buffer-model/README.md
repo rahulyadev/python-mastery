@@ -43,7 +43,7 @@ The boxes are conceptual byte positions, not literal CPython object headers, add
 1. Text and binary data are distinct domains: cross them only with an explicit encoding and error policy.
 2. `bytes` and `bytearray` index to integers in `0..255`; their slices produce binary sequences, not integers.
 3. `bytes` is immutable; `bytearray` supports same-size mutation and resizing, subject to valid values and live-export restrictions.
-4. An ordinary `bytes` or `bytearray` slice owns a result; a `memoryview` slice is another view of exporter-owned storage.
+4. A `bytearray` slice has independent mutable storage and a `bytes` slice is an immutable value; a `memoryview` slice remains a view of exporter-owned storage.
 5. Read-only means “cannot write through this view,” not “frozen snapshot”; later exporter mutation can remain visible.
 6. `len(view)` counts top-level logical elements, while `view.nbytes` counts logical data bytes; `format`, `itemsize`, `shape`, and `strides` define how to interpret them.
 7. Consumers may require readable or writable, contiguous or structured buffers. Check the exact consumer contract instead of assuming every buffer-shaped object is accepted.
@@ -113,7 +113,7 @@ Expected reasoning:
 | Interview compatibility | Python 3.11 |
 | Initially tested runtime | CPython 3.14.4 on Linux x86_64 |
 | Last source audit | 2026-08-29 |
-| Artifact state | Draft |
+| Artifact state | Approved |
 
 ## 1. Learning outcome and evidence
 
