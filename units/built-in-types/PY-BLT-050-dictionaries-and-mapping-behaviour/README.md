@@ -88,7 +88,7 @@ Observed on both tested runtimes: `['quota', 'enabled']`, then `0`. Lookup found
 | Interview compatibility | Python 3.11 |
 | Initially tested runtime | CPython 3.14.7 and CPython 3.11.16; Linux x86_64, conventional GIL builds |
 | Last source audit | 2026-08-30 |
-| Artifact state | Draft |
+| Artifact state | Approved |
 
 ## 1. Learning outcome and evidence
 
@@ -127,7 +127,7 @@ Repository validation, the two example scripts, all three runnable note snippets
 
 Browser review exercised all eleven states, forward/backward controls, scenario reset, and disabled endpoint controls. The standalone visual was checked at 320, 360, and 736 pixels in light and dark themes; the conversation preview was also checked at narrow and wide widths. No horizontal overflow or browser console errors were found. The compact view keeps key labels on one line while allowing long values to wrap.
 
-The initialized artifact remains **Draft** pending final approval. Source review, runnable checks, and prepared material do not by themselves advance the learner state.
+The source audit, complete template content, runnable checks, and protected practice justify **Approved** artifact state. Learning progress is evaluated separately from artifact quality.
 
 No learner attempt, question response, reconstruction, or recall session was supplied. The learning state remains **Not started**; review dates and weaknesses are unchanged. Prepared exercises and experiment observations are teaching material, not learner evidence.
 
