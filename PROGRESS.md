@@ -79,7 +79,7 @@ Requires Retained state, transfer across at least two contexts, successful teach
 | `PY-BLT-030` | [Bytes, bytearray, memoryview, and the buffer model](CURRICULUM.md#py-blt-030) | Professional | Approved | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-030-bytes-bytearray-memoryview-and-the-buffer-model/README.md) |
 | `PY-BLT-040` | [Lists, tuples, ranges, and sequence behaviour](CURRICULUM.md#py-blt-040) | Core | Approved | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-040-lists-tuples-ranges-and-sequence-behaviour/README.md) |
 | `PY-BLT-050` | [Dictionaries and mapping behaviour](CURRICULUM.md#py-blt-050) | Core | Approved | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-050-dictionaries-and-mapping-behaviour/README.md) |
-| `PY-BLT-060` | [Sets and frozensets](CURRICULUM.md#py-blt-060) | Core | Absent | Not started | — | — | — | — |
+| `PY-BLT-060` | [Sets and frozensets](CURRICULUM.md#py-blt-060) | Core | Approved | Not started | — | — | — | [Unit note](units/built-in-types/PY-BLT-060-sets-and-frozensets/README.md) |
 | `PY-BLT-070` | [Unpacking, comprehensions, and generator expressions](CURRICULUM.md#py-blt-070) | Core | Absent | Not started | — | — | — | — |
 | `PY-BLT-080` | [Equality, ordering, hashing, and hashability](CURRICULUM.md#py-blt-080) | Core | Absent | Not started | — | — | — | — |
 | `PY-BLT-090` | [Protocol-facing built-in functions and container complexity](CURRICULUM.md#py-blt-090) | Core | Absent | Not started | — | — | — | — |

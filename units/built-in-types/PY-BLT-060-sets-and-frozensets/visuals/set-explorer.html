@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>PY-BLT-060 · Set algebra explorer</title>
+  <style>
+    :root { color-scheme: light dark; --page: #f7f8fa; --ink: #192735; --muted: #4c5d6c; --line: #c6cfd8; --surface: #fff; --accent: #17694f; --selected: #d9f1e7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--page); color: var(--ink); font: 17px/1.55 system-ui, sans-serif; }
+    main { max-width: 960px; margin: 0 auto; padding: 38px 24px; }
+    .eyebrow { margin: 0; color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+    h1 { margin: 6px 0; font-size: clamp(27px, 4vw, 39px); line-height: 1.2; letter-spacing: -.025em; }
+    h2 { margin: 0 0 8px; font-size: 19px; }
+    p { margin: 8px 0 18px; }
+    .muted { color: var(--muted); }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 26px 0 20px; }
+    label { display: grid; gap: 6px; font-weight: 600; }
+    select { width: 100%; min-height: 46px; padding: 10px; font: inherit; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; overflow-wrap: anywhere; }
+    .inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 18px; }
+    .inputs p { margin: 0; }
+    .regions { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+    .region { padding: 20px; min-width: 0; }
+    .region + .region { border-left: 1px solid var(--line); }
+    .region small { display: block; color: var(--muted); }
+    .members { display: flex; flex-wrap: wrap; gap: 8px; align-content: start; margin-top: 16px; }
+    .member { border: 1px solid var(--line); padding: 5px 9px; border-radius: 4px; color: var(--muted); }
+    .member.included { background: var(--selected); border-color: var(--accent); color: var(--ink); }
+    .member.included::before { content: "✓ "; color: var(--accent); }
+    .empty { color: var(--muted); font-style: italic; }
+    .result { padding: 24px 0 18px; border-bottom: 1px solid var(--line); }
+    .result p { margin: 0 0 10px; }
+    output { display: block; font-size: 22px; font-weight: 600; overflow-wrap: anywhere; }
+    .relations { display: flex; flex-wrap: wrap; gap: 12px 26px; padding: 18px 0; }
+    .relations p { margin: 0; }
+    .guide { margin-top: 24px; }
+    .guide p { margin: 0 0 12px; }
+    a { color: var(--accent); }
+    footer { margin-top: 25px; font-size: 14px; color: var(--muted); }
+    @media (max-width: 600px) {
+      main { padding: 24px 16px; }
+      .controls, .inputs { grid-template-columns: 1fr; gap: 12px; }
+      .regions { grid-template-columns: 1fr; }
+      .region { padding: 14px 16px; }
+      .region + .region { border-left: 0; border-top: 1px solid var(--line); }
+      .members { margin-top: 8px; }
+      output { font-size: 19px; }
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --page: #151e27; --ink: #edf3f8; --muted: #b7c6d3; --line: #536575; --surface: #1e2b37; --accent: #87dec0; --selected: #254d42; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">PY-BLT-060 · Sets and frozensets</p>
+    <h1>Which members survive?</h1>
+    <p class="muted">Keep the inputs fixed. Change the question.</p>
+  </header>
+  <div class="controls">
+    <label for="scenario">Input relationship
+      <select id="scenario">
+        <option value="overlap">Partial overlap</option>
+        <option value="subset">A is a proper subset</option>
+        <option value="disjoint">Disjoint sets</option>
+        <option value="empty">A is empty</option>
+        <option value="equal">Equal members</option>
+      </select>
+    </label>
+    <label for="operation">Set operation
+      <select id="operation">
+        <option value="union">A | B · Union</option>
+        <option value="intersection">A &amp; B · Intersection</option>
+        <option value="difference">A − B · A only</option>
+        <option value="reverse_difference">B − A · B only</option>
+        <option value="symmetric_difference">A ^ B · Symmetric difference</option>
+      </select>
+    </label>
+  </div>
+  <div class="inputs">
+    <p><strong>A</strong> <code id="left-input"></code></p>
+    <p><strong>B</strong> <code id="right-input"></code></p>
+  </div>
+  <section class="regions" aria-label="Membership regions; checked members belong to the result">
+    <div class="region"><h2>A only</h2><small>In A, absent from B</small><div id="left-only" class="members"></div></div>
+    <div class="region"><h2>Both</h2><small>In A and in B</small><div id="both" class="members"></div></div>
+    <div class="region"><h2>B only</h2><small>In B, absent from A</small><div id="right-only" class="members"></div></div>
+  </section>
+  <section class="result" aria-live="polite" aria-atomic="true" aria-label="Operation result">
+    <p><code id="expression"></code></p>
+    <output id="result-members"></output>
+    <p id="rule" class="muted"></p>
+  </section>
+  <section class="relations" aria-label="Input comparisons">
+    <p><code>A &lt;= B</code>: <strong id="subset"></strong></p>
+    <p><code>A &lt; B</code>: <strong id="proper-subset"></strong></p>
+    <p><code>A.isdisjoint(B)</code>: <strong id="disjoint"></strong></p>
+  </section>
+  <section class="guide" aria-label="Reading guide and limitations">
+    <p><strong>How to read:</strong> Each region describes membership in the inputs. A check mark means that member is included in the selected result. The result is a new set; A and B stay unchanged.</p>
+    <p><strong>Key insight:</strong> Difference is directional. Symmetric difference keeps both outer regions and excludes their overlap.</p>
+    <p><strong>Limitation:</strong> Names are arranged alphabetically for display, not in Python iteration order. This is a replay of 25 Python-computed results, not a Python interpreter, Venn area chart, or hash-table layout. It uses only string members and does not simulate arbitrary equality or mutation.</p>
+  </section>
+  <footer>Offline and dependency-free · <a href="../README.md">Unit note</a> · <a href="trace_data.py">Python state generator</a></footer>
+  <noscript><p>This explorer needs JavaScript. The unit note includes static diagrams and runnable Python examples.</p></noscript>
+</main>
+<script id="python-traces" type="application/json">
+[
+  {"id":"overlap","label":"Partial overlap","a":["api","cache","worker"],"b":["cache","cron"],"left_only":["api","worker"],"both":["cache"],"right_only":["cron"],"subset":false,"proper_subset":false,"disjoint":false,"results":{"union":["api","cache","cron","worker"],"intersection":["cache"],"difference":["api","worker"],"reverse_difference":["cron"],"symmetric_difference":["api","cron","worker"]}},
+  {"id":"subset","label":"A is a proper subset","a":["cache"],"b":["api","cache"],"left_only":[],"both":["cache"],"right_only":["api"],"subset":true,"proper_subset":true,"disjoint":false,"results":{"union":["api","cache"],"intersection":["cache"],"difference":[],"reverse_difference":["api"],"symmetric_difference":["api"]}},
+  {"id":"disjoint","label":"Disjoint sets","a":["api"],"b":["cron"],"left_only":["api"],"both":[],"right_only":["cron"],"subset":false,"proper_subset":false,"disjoint":true,"results":{"union":["api","cron"],"intersection":[],"difference":["api"],"reverse_difference":["cron"],"symmetric_difference":["api","cron"]}},
+  {"id":"empty","label":"A is empty","a":[],"b":["cache"],"left_only":[],"both":[],"right_only":["cache"],"subset":true,"proper_subset":true,"disjoint":true,"results":{"union":["cache"],"intersection":[],"difference":[],"reverse_difference":["cache"],"symmetric_difference":["cache"]}},
+  {"id":"equal","label":"Equal members","a":["api","cache"],"b":["api","cache"],"left_only":[],"both":["api","cache"],"right_only":[],"subset":true,"proper_subset":false,"disjoint":false,"results":{"union":["api","cache"],"intersection":["api","cache"],"difference":[],"reverse_difference":[],"symmetric_difference":[]}}
+]
+</script>
+<script>
+  "use strict";
+  const traces = JSON.parse(document.getElementById("python-traces").textContent);
+  const scenario = document.getElementById("scenario");
+  const operation = document.getElementById("operation");
+  const rules = {
+    union: ["A | B", "Keep every member present in either input."],
+    intersection: ["A & B", "Keep only members shared by both inputs."],
+    difference: ["A - B", "Start with A; exclude every member also found in B."],
+    reverse_difference: ["B - A", "Start with B; exclude every member also found in A."],
+    symmetric_difference: ["A ^ B", "Keep members present in exactly one input."]
+  };
+  function formatSet(values) {
+    return values.length ? "{" + values.map(value => "'" + value + "'").join(", ") + "}" : "set()";
+  }
+  function region(id, values, included) {
+    const container = document.getElementById(id);
+    container.replaceChildren();
+    if (!values.length) {
+      const empty = document.createElement("span");
+      empty.className = "empty";
+      empty.textContent = "No members";
+      container.append(empty);
+    }
+    for (const value of values) {
+      const member = document.createElement("span");
+      member.className = "member" + (included.includes(value) ? " included" : "");
+      member.textContent = value;
+      member.setAttribute("aria-label", value + (included.includes(value) ? ": included" : ": excluded"));
+      container.append(member);
+    }
+  }
+  function render() {
+    const state = traces.find(item => item.id === scenario.value);
+    const result = state.results[operation.value];
+    document.getElementById("left-input").textContent = formatSet(state.a);
+    document.getElementById("right-input").textContent = formatSet(state.b);
+    region("left-only", state.left_only, result);
+    region("both", state.both, result);
+    region("right-only", state.right_only, result);
+    document.getElementById("expression").textContent = rules[operation.value][0];
+    document.getElementById("result-members").textContent = formatSet(result);
+    document.getElementById("rule").textContent = rules[operation.value][1];
+    document.getElementById("subset").textContent = state.subset ? "True" : "False";
+    document.getElementById("proper-subset").textContent = state.proper_subset ? "True" : "False";
+    document.getElementById("disjoint").textContent = state.disjoint ? "True" : "False";
+  }
+  scenario.addEventListener("change", render);
+  operation.addEventListener("change", render);
+  render();
+</script>
+</body>
+</html>
