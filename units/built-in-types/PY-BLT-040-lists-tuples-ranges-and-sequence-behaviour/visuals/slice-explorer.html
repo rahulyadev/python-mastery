@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PY-BLT-040 · Slice explorer</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --surface: light-dark(#ffffff, #17191d);
+      --ink: light-dark(#19252c, #edf2f5);
+      --muted: light-dark(#52646f, #afc0cb);
+      --line: light-dark(#d1dce3, #41515c);
+      --selected: light-dark(#d6eee8, #183d37);
+      --accent: light-dark(#096853, #80d7bc);
+      --error: light-dark(#a41a25, #ffabb2);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--surface);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, sans-serif;
+    }
+    main { max-width: 850px; margin: 0 auto; padding: 28px 20px; }
+    h1 { margin: 0 0 4px; font-size: 1.65rem; font-weight: 600; }
+    h2 { margin: 20px 0 10px; font-size: 1rem; font-weight: 600; }
+    p { margin: 8px 0; }
+    .eyebrow, .muted, .index { color: var(--muted); }
+    .eyebrow { font-size: .85rem; letter-spacing: .06em; }
+    .controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 20px 0 12px; }
+    label { display: grid; gap: 6px; }
+    input {
+      width: 100%; min-width: 0; min-height: 44px; padding: 8px 10px;
+      color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+      border-radius: 6px; font: inherit;
+    }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 20px; }
+    button {
+      min-height: 44px; padding: 8px 12px; border: 1px solid var(--line);
+      border-radius: 6px; background: var(--surface); color: var(--ink); font: inherit;
+      cursor: pointer;
+    }
+    button:hover { background: var(--selected); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    code, output { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .expression { display: block; padding: 12px 0; border-block: 1px solid var(--line); }
+    .sequence { display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 7px; padding: 0; margin: 8px 0; list-style: none; }
+    .cell { text-align: center; padding: 8px 2px; }
+    .value { display: block; font-size: 1.2rem; font-weight: 600; }
+    .index, .visit { display: block; font-size: .8rem; }
+    .cell.selected { background: var(--selected); border-radius: 6px; }
+    .visit { min-height: 1.5em; }
+    .result { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0; margin: 8px 0; list-style: none; }
+    .result li { padding: 6px 12px; background: var(--selected); border-radius: 6px; }
+    .empty { color: var(--muted); }
+    #slice-error { color: var(--error); }
+    [hidden] { display: none !important; }
+    details { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 14px; }
+    summary { cursor: pointer; min-height: 44px; }
+    a { color: var(--accent); }
+    @media (max-width: 420px) {
+      main { padding: 20px 14px; }
+      .controls { gap: 12px; }
+      .sequence { gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+<main id="py-blt-040-slice-explorer">
+  <div class="eyebrow">PY-BLT-040 · LISTS, TUPLES, RANGES</div>
+  <h1>Which positions does a slice visit?</h1>
+  <p class="muted">Change a bound. Watch the selected positions and their order.</p>
+
+  <div class="controls">
+    <label for="slice-length">Sequence length · 0–12
+      <input id="slice-length" type="number" min="0" max="12" step="1" value="6">
+    </label>
+    <label for="slice-step">Step · blank means 1
+      <input id="slice-step" type="text" inputmode="text" value="-1" placeholder="None" autocomplete="off" spellcheck="false">
+    </label>
+    <label for="slice-start">Start · blank means omitted
+      <input id="slice-start" type="text" inputmode="text" placeholder="None" autocomplete="off" spellcheck="false">
+    </label>
+    <label for="slice-stop">Stop · excluded, blank means omitted
+      <input id="slice-stop" type="text" inputmode="text" placeholder="None" autocomplete="off" spellcheck="false">
+    </label>
+  </div>
+  <div class="presets" aria-label="Slice examples">
+    <button type="button" data-preset="reverse">Full reverse</button>
+    <button type="button" data-preset="explicit-stop">Explicit −1 stop</button>
+    <button type="button" data-preset="clipped">Clipped stride</button>
+  </div>
+
+  <p id="slice-error" role="alert" hidden></p>
+  <section id="slice-results" aria-label="Slice selection">
+    <code class="expression" id="slice-expression"></code>
+    <h2>Source order <span class="muted">· position / negative index</span></h2>
+    <ol class="sequence" id="source-sequence" aria-label="Source values and indices"></ol>
+    <h2>Visit order <span class="muted">· selected values</span></h2>
+    <ol class="result" id="result-sequence" aria-label="Values in slice order"></ol>
+    <p><code id="normalized-bounds"></code></p>
+    <p id="selection-summary" aria-live="polite"></p>
+  </section>
+
+  <details>
+    <summary>How to read this visual, key insight, and limits</summary>
+    <p><strong>Read:</strong> source cells stay in source order. Highlighted cells show their visit number; the second row follows that visit order. Negative indices label the same source positions.</p>
+    <p><strong>Insight:</strong> the sign of the step sets direction and defaults. With a negative step, an omitted stop reaches past position zero; explicit <code>-1</code> instead refers to the last position.</p>
+    <p><strong>Limit:</strong> this is an offline model for ordinary list slices, not a Python interpreter. Length is bounded to 0–12 and bounds to JavaScript safe integers. It does not model nested sharing, custom objects, or memory layout. Wrapping source cells on small screens does not change their indices.</p>
+    <p>Normalized bounds describe <code>range(start, stop, step)</code> positions. Do not reuse them as a raw slice: Python would normalize negative numbers again.</p>
+    <p><a href="../README.md">Unit note</a> · <a href="https://docs.python.org/3.14/reference/datamodel.html#slice.indices">Python slice.indices contract</a></p>
+  </details>
+  <noscript><p>This explorer needs JavaScript. The unit note includes equivalent text diagrams.</p></noscript>
+</main>
+
+<script id="slice-model">
+"use strict";
+
+function parseSliceBound(raw, label) {
+  const value = raw.trim();
+  if (value === "" || value === "None") return null;
+  if (!/^[+-]?\d+$/.test(value) || !Number.isSafeInteger(Number(value))) {
+    throw new TypeError(label + ": enter a safe integer, None, or leave blank.");
+  }
+  return Number(value);
+}
+
+function normalizeSlice(length, start, stop, step) {
+  if (!Number.isInteger(length) || length < 0 || length > 12) {
+    throw new RangeError("Sequence length must be an integer from 0 to 12.");
+  }
+  for (const value of [start, stop, step]) {
+    if (value !== null && !Number.isSafeInteger(value)) {
+      throw new TypeError("Slice bounds must be safe integers or null.");
+    }
+  }
+  const stride = step === null ? 1 : step;
+  if (stride === 0) throw new RangeError("ValueError: slice step cannot be zero.");
+  const forward = stride > 0;
+  const lower = forward ? 0 : -1;
+  const upper = forward ? length : length - 1;
+  function bound(value, fallback) {
+    if (value === null) return fallback;
+    const translated = value < 0 ? value + length : value;
+    return Math.min(upper, Math.max(lower, translated));
+  }
+  const first = bound(start, forward ? 0 : length - 1);
+  const end = bound(stop, forward ? length : -1);
+  const positions = [];
+  for (let index = first; forward ? index < end : index > end; index += stride) {
+    positions.push(index);
+  }
+  return { bounds: [first, end, stride], positions };
+}
+</script>
+<script id="slice-ui">
+(() => {
+  const root = document.getElementById("py-blt-040-slice-explorer");
+  const field = (name) => root.querySelector("#slice-" + name);
+  const lengthInput = field("length");
+  const inputs = { start: field("start"), stop: field("stop"), step: field("step") };
+  const error = field("error");
+  const results = field("results");
+  const source = root.querySelector("#source-sequence");
+  const result = root.querySelector("#result-sequence");
+  const repr = (value) => value === null ? "None" : String(value);
+  const raw = (value) => value === null ? "" : String(value);
+
+  function update() {
+    const length = lengthInput.value.trim() === "" ? NaN : Number(lengthInput.value);
+    try {
+      const start = parseSliceBound(inputs.start.value, "Start");
+      const stop = parseSliceBound(inputs.stop.value, "Stop");
+      const step = parseSliceBound(inputs.step.value, "Step");
+      const model = normalizeSlice(length, start, stop, step);
+      const values = Array.from({ length }, (_, index) => String.fromCharCode(65 + index));
+      root.querySelector("#slice-expression").textContent =
+        `s[${raw(start)}:${raw(stop)}:${raw(step)}]`;
+      source.replaceChildren();
+      values.forEach((value, index) => {
+        const visit = model.positions.indexOf(index);
+        const cell = document.createElement("li");
+        cell.className = "cell" + (visit < 0 ? "" : " selected");
+        cell.setAttribute("aria-label", `${value}, index ${index}, negative index ${index - length}` +
+          (visit < 0 ? ", not selected" : `, visit ${visit + 1}`));
+        for (const [className, text] of [
+          ["index", `${index} / ${index - length}`],
+          ["value", value],
+          ["visit", visit < 0 ? "—" : `visit ${visit + 1}`],
+        ]) {
+          const span = document.createElement("span");
+          span.className = className;
+          span.textContent = text;
+          cell.append(span);
+        }
+        source.append(cell);
+      });
+      if (length === 0) {
+        const empty = document.createElement("li");
+        empty.className = "empty";
+        empty.textContent = "Empty source []";
+        source.append(empty);
+      }
+      result.replaceChildren();
+      for (const index of model.positions) {
+        const item = document.createElement("li");
+        item.textContent = `${values[index]} · index ${index}`;
+        result.append(item);
+      }
+      if (model.positions.length === 0) {
+        const empty = document.createElement("li");
+        empty.textContent = "[] · no positions selected";
+        result.append(empty);
+      }
+      root.querySelector("#normalized-bounds").textContent =
+        `slice(${repr(start)}, ${repr(stop)}, ${repr(step)}).indices(${length}) → (${model.bounds.join(", ")})`;
+      root.querySelector("#selection-summary").textContent =
+        `${model.positions.length} selected · positions [${model.positions.join(", ")}] · ` +
+        (model.bounds[2] > 0 ? "forward" : "backward");
+      error.hidden = true;
+      error.textContent = "";
+      results.hidden = false;
+    } catch (failure) {
+      results.hidden = true;
+      error.textContent = failure.message;
+      error.hidden = false;
+    }
+  }
+
+  root.querySelectorAll("input").forEach((input) => input.addEventListener("input", update));
+  root.querySelectorAll("[data-preset]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const presets = {
+        reverse: ["", "", "-1"],
+        "explicit-stop": ["", "-1", "-1"],
+        clipped: ["50", "-50", "-2"],
+      };
+      lengthInput.value = "6";
+      [inputs.start.value, inputs.stop.value, inputs.step.value] = presets[button.dataset.preset];
+      update();
+    });
+  });
+  update();
+})();
+</script>
+</body>
+</html>
