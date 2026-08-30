@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PY-BLT-050 · Dictionary state explorer</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --background: light-dark(#ffffff, #171b20);
+      --foreground: light-dark(#172932, #e7f0f3);
+      --muted-foreground: light-dark(#526670, #adbec6);
+      --border: light-dark(#cfdbe0, #44545e);
+      --primary: light-dark(#213e49, #d5e9ee);
+      --primary-foreground: light-dark(#ffffff, #13262d);
+      --viz-series-1: light-dark(#08766c, #7be0d1);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--foreground); background: var(--background);
+      font: 16px/1.5 system-ui, sans-serif; }
+    .page { max-width: 850px; margin: 0 auto; padding: 24px 18px; }
+    h1, h2, h3 { font-weight: 500; }
+    h1 { font-size: 1.5rem; margin: 0 0 18px; }
+    h2 { font-size: 1.25rem; }
+    h3 { font-size: 1rem; }
+    .text-small { font-size: .875rem; }
+    .text-muted { color: var(--muted-foreground); }
+    .text-nowrap { white-space: nowrap; }
+    .viz-controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+    .form-label { display: grid; gap: 5px; }
+    .btn, .form-select { font: inherit; color: var(--foreground); background: var(--background);
+      min-height: 44px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; }
+    .btn { cursor: pointer; }
+    .btn-primary { color: var(--primary-foreground); background: var(--primary); }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .table { width: 100%; border-collapse: collapse; text-align: left; }
+    .table th, .table td { padding: 8px 7px; border-bottom: 1px solid var(--border);
+      vertical-align: top; overflow-wrap: anywhere; }
+    .table th { font-weight: 500; }
+    code { overflow-wrap: anywhere; }
+    details { margin-top: 24px; }
+    summary { cursor: pointer; min-height: 44px; }
+    a { color: var(--viz-series-1); }
+  </style>
+</head>
+<body>
+<div class="page">
+<main id="py-blt-050-explorer">
+  <style>
+    #py-blt-050-explorer { color: var(--foreground); }
+    #py-blt-050-explorer .dict-operation { display: block; white-space: pre-wrap;
+      overflow-wrap: anywhere; margin: 18px 0; }
+    #py-blt-050-explorer .dict-tables { display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 24px; }
+    #py-blt-050-explorer .dict-tables h3 { margin: 0 0 8px; }
+    #py-blt-050-explorer .dict-reference { display: block; color: var(--muted-foreground); }
+    #py-blt-050-explorer .dict-views { display: grid; grid-template-columns: auto 1fr;
+      gap: 8px 16px; margin: 20px 0; }
+    #py-blt-050-explorer .dict-views dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+    #py-blt-050-explorer .dict-detail { color: var(--foreground); margin: 16px 0 0; }
+    #py-blt-050-explorer [hidden] { display: none !important; }
+    #py-blt-050-explorer .dict-step { align-self: center; font-variant-numeric: tabular-nums; }
+    @media (max-width: 440px) {
+      #py-blt-050-explorer .dict-views { grid-template-columns: 1fr; gap: 3px; }
+      #py-blt-050-explorer .dict-views dd { margin-bottom: 9px; }
+    }
+  </style>
+  <h2>What stays live when a dictionary changes?</h2>
+  <div class="viz-controls">
+    <label class="form-label" for="dict-scenario">Scenario
+      <select class="form-select" id="dict-scenario">
+        <option value="order">Insertion order</option>
+        <option value="ownership">Views and shallow copies</option>
+      </select>
+    </label>
+    <button class="btn" id="dict-previous" type="button">Previous</button>
+    <button class="btn btn-primary" id="dict-next" type="button">Next</button>
+    <span class="dict-step text-small" id="dict-step"></span>
+  </div>
+  <code class="dict-operation" id="dict-operation"></code>
+  <div class="dict-tables">
+    <section aria-label="Original dictionary">
+      <h3><code>d</code> · current entries</h3>
+      <table class="table table-sm">
+        <thead><tr><th class="text-nowrap" scope="col">Visit</th><th class="text-nowrap" scope="col">Key</th><th scope="col">Value</th></tr></thead>
+        <tbody id="dict-entries"></tbody>
+      </table>
+    </section>
+    <section id="dict-copy" aria-label="Shallow copy" hidden>
+      <h3><code>copied</code> · separate outer dict</h3>
+      <table class="table table-sm">
+        <thead><tr><th class="text-nowrap" scope="col">Visit</th><th class="text-nowrap" scope="col">Key</th><th scope="col">Value</th></tr></thead>
+        <tbody id="dict-copy-entries"></tbody>
+      </table>
+    </section>
+  </div>
+  <dl class="dict-views">
+    <dt>Live keys view</dt><dd><code id="dict-live-keys"></code></dd>
+    <dt>Saved key tuple</dt><dd><code id="dict-saved-keys"></code></dd>
+  </dl>
+  <p class="dict-detail" id="dict-detail" aria-live="polite"></p>
+  <script id="dict-trace-data" type="application/json">
+[
+  {
+    "id": "order",
+    "title": "Insertion order",
+    "steps": [
+      {
+        "operation": "d = {'queue': 3, 'workers': 2}; keys = d.keys(); saved = tuple(d)",
+        "detail": "The keys view and the saved tuple initially show the same names.",
+        "entries": [
+          {
+            "key": "'queue'",
+            "value": "3",
+            "reference": ""
+          },
+          {
+            "key": "'workers'",
+            "value": "2",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['queue', 'workers']",
+        "saved_keys": "('queue', 'workers')",
+        "copy_entries": null
+      },
+      {
+        "operation": "d['queue'] = 7",
+        "detail": "Replacing a value keeps its key's position.",
+        "entries": [
+          {
+            "key": "'queue'",
+            "value": "7",
+            "reference": ""
+          },
+          {
+            "key": "'workers'",
+            "value": "2",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['queue', 'workers']",
+        "saved_keys": "('queue', 'workers')",
+        "copy_entries": null
+      },
+      {
+        "operation": "d['limit'] = 0",
+        "detail": "A new key appears last; the saved tuple is unchanged.",
+        "entries": [
+          {
+            "key": "'queue'",
+            "value": "7",
+            "reference": ""
+          },
+          {
+            "key": "'workers'",
+            "value": "2",
+            "reference": ""
+          },
+          {
+            "key": "'limit'",
+            "value": "0",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['queue', 'workers', 'limit']",
+        "saved_keys": "('queue', 'workers')",
+        "copy_entries": null
+      },
+      {
+        "operation": "del d['workers']",
+        "detail": "The live view loses the deleted key.",
+        "entries": [
+          {
+            "key": "'queue'",
+            "value": "7",
+            "reference": ""
+          },
+          {
+            "key": "'limit'",
+            "value": "0",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['queue', 'limit']",
+        "saved_keys": "('queue', 'workers')",
+        "copy_entries": null
+      },
+      {
+        "operation": "d['workers'] = 4",
+        "detail": "Reinsertion gives the key a new position at the end.",
+        "entries": [
+          {
+            "key": "'queue'",
+            "value": "7",
+            "reference": ""
+          },
+          {
+            "key": "'limit'",
+            "value": "0",
+            "reference": ""
+          },
+          {
+            "key": "'workers'",
+            "value": "4",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['queue', 'limit', 'workers']",
+        "saved_keys": "('queue', 'workers')",
+        "copy_entries": null
+      },
+      {
+        "operation": "d.popitem()",
+        "detail": "Removed the last inserted entry: ('workers', 4).",
+        "entries": [
+          {
+            "key": "'queue'",
+            "value": "7",
+            "reference": ""
+          },
+          {
+            "key": "'limit'",
+            "value": "0",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['queue', 'limit']",
+        "saved_keys": "('queue', 'workers')",
+        "copy_entries": null
+      }
+    ]
+  },
+  {
+    "id": "ownership",
+    "title": "Views and shallow copies",
+    "steps": [
+      {
+        "operation": "d = {'tags': ['base'], 'timeout': 10}; copied = d.copy(); keys = d.keys(); saved = tuple(d)",
+        "detail": "Two outer dictionaries point to the same list A.",
+        "entries": [
+          {
+            "key": "'tags'",
+            "value": "['base']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['tags', 'timeout']",
+        "saved_keys": "('tags', 'timeout')",
+        "copy_entries": [
+          {
+            "key": "'tags'",
+            "value": "['base']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          }
+        ]
+      },
+      {
+        "operation": "d['region'] = 'west'",
+        "detail": "A new binding changes d and its live view, not copied.",
+        "entries": [
+          {
+            "key": "'tags'",
+            "value": "['base']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          },
+          {
+            "key": "'region'",
+            "value": "'west'",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['tags', 'timeout', 'region']",
+        "saved_keys": "('tags', 'timeout')",
+        "copy_entries": [
+          {
+            "key": "'tags'",
+            "value": "['base']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          }
+        ]
+      },
+      {
+        "operation": "d['tags'].append('canary')",
+        "detail": "Both dictionaries still reach the same edited list A.",
+        "entries": [
+          {
+            "key": "'tags'",
+            "value": "['base', 'canary']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          },
+          {
+            "key": "'region'",
+            "value": "'west'",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['tags', 'timeout', 'region']",
+        "saved_keys": "('tags', 'timeout')",
+        "copy_entries": [
+          {
+            "key": "'tags'",
+            "value": "['base', 'canary']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          }
+        ]
+      },
+      {
+        "operation": "d['tags'] = ['replacement']",
+        "detail": "Only d is rebound to list B; copied still reaches list A.",
+        "entries": [
+          {
+            "key": "'tags'",
+            "value": "['replacement']",
+            "reference": "list B"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          },
+          {
+            "key": "'region'",
+            "value": "'west'",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['tags', 'timeout', 'region']",
+        "saved_keys": "('tags', 'timeout')",
+        "copy_entries": [
+          {
+            "key": "'tags'",
+            "value": "['base', 'canary']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          }
+        ]
+      },
+      {
+        "operation": "copied['tags'].append('copy-edit')",
+        "detail": "Editing list A now leaves d's list B unchanged.",
+        "entries": [
+          {
+            "key": "'tags'",
+            "value": "['replacement']",
+            "reference": "list B"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          },
+          {
+            "key": "'region'",
+            "value": "'west'",
+            "reference": ""
+          }
+        ],
+        "live_keys": "['tags', 'timeout', 'region']",
+        "saved_keys": "('tags', 'timeout')",
+        "copy_entries": [
+          {
+            "key": "'tags'",
+            "value": "['base', 'canary', 'copy-edit']",
+            "reference": "list A"
+          },
+          {
+            "key": "'timeout'",
+            "value": "10",
+            "reference": ""
+          }
+        ]
+      }
+    ]
+  }
+]
+</script>
+  <script>
+    (() => {
+      const root = document.getElementById("py-blt-050-explorer");
+      const traces = JSON.parse(root.querySelector("#dict-trace-data").textContent);
+      const select = root.querySelector("#dict-scenario");
+      const previous = root.querySelector("#dict-previous");
+      const next = root.querySelector("#dict-next");
+      let position = 0;
+      function drawRows(target, entries) {
+        target.replaceChildren();
+        entries.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          [String(index + 1), entry.key, entry.value].forEach((value, column) => {
+            const cell = document.createElement("td");
+            if (column < 2) cell.className = "text-nowrap";
+            const text = document.createElement(column === 0 ? "span" : "code");
+            text.textContent = value;
+            cell.append(text);
+            if (column === 2 && entry.reference) {
+              const reference = document.createElement("span");
+              reference.className = "dict-reference text-small";
+              reference.textContent = entry.reference;
+              cell.append(reference);
+            }
+            row.append(cell);
+          });
+          target.append(row);
+        });
+      }
+      function render() {
+        const trace = traces.find(item => item.id === select.value);
+        const state = trace.steps[position];
+        root.querySelector("#dict-step").textContent = `Step ${position + 1} of ${trace.steps.length}`;
+        root.querySelector("#dict-operation").textContent = state.operation;
+        drawRows(root.querySelector("#dict-entries"), state.entries);
+        root.querySelector("#dict-copy").hidden = state.copy_entries === null;
+        drawRows(root.querySelector("#dict-copy-entries"), state.copy_entries || []);
+        root.querySelector("#dict-live-keys").textContent = state.live_keys;
+        root.querySelector("#dict-saved-keys").textContent = state.saved_keys;
+        root.querySelector("#dict-detail").textContent = state.detail;
+        previous.disabled = position === 0;
+        next.disabled = position === trace.steps.length - 1;
+      }
+      select.addEventListener("change", () => { position = 0; render(); });
+      previous.addEventListener("click", () => { if (position > 0) { position -= 1; render(); } });
+      next.addEventListener("click", () => {
+        const trace = traces.find(item => item.id === select.value);
+        if (position < trace.steps.length - 1) { position += 1; render(); }
+      });
+      render();
+    })();
+  </script>
+</main>
+<details>
+  <summary>How to read this visual</summary>
+  <p>Choose a scenario and move one operation at a time. Each state shows the result after that operation. Visit numbers indicate iteration positions, not keys for numeric indexing. Matching list labels indicate the same child object.</p>
+  <p><strong>Key insight:</strong> views follow the original dictionary; shallow copies keep independent bindings but can still share children.</p>
+  <p><strong>Limitation:</strong> these are eleven captured states from real Python, not a Python interpreter or a drawing of CPython memory. The page has no network dependencies. Refresh or check the data with <code>trace_data.py</code>.</p>
+  <p><a href="../README.md">PY-BLT-050 unit note</a></p>
+</details>
+</div>
+</body>
+</html>
