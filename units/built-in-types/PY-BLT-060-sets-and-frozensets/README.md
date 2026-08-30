@@ -95,7 +95,7 @@ Expected reasoning: the first difference identifies additions; the second identi
 | Interview compatibility | Python 3.11 |
 | Initially tested runtime | CPython 3.14.7 and CPython 3.11.16; Linux x86_64, conventional GIL builds |
 | Last source audit | 2026-08-30 |
-| Artifact state | Draft |
+| Artifact state | Approved |
 
 ## 1. Learning outcome and evidence
 
@@ -122,6 +122,14 @@ The tests execute four marked note snippets, check the explorer's embedded data 
 The Node.js check uses a minimal DOM stand-in to exercise all control-event paths and result labels. It does not launch a browser or verify CSS, responsive layout, or assistive-technology behaviour.
 
 Browser preview was attempted on 2026-08-30, but the Browser security policy blocked the local-file URL. No browser layout check or screenshot is claimed. The static diagrams remain readable in this note, and the explorer's Python data and local JavaScript logic are independently testable.
+
+### Artifact verification — 2026-08-30
+
+Repository validation passed. **37 Python tests** passed with no skips on each of **CPython 3.14.7** and **CPython 3.11.16**. Both example scripts, both experiment probes, all four runnable note snippets, and the visual state generator ran successfully on both runtimes. The experiment transcripts and generated visual data matched fresh execution exactly.
+
+**27 local JavaScript checks** passed on Node.js **24.19.0**, covering initialization plus the 25 scenario/operation combinations. These use the documented DOM stand-in, not a browser. Ruff **0.16.1** lint and formatting checks and Git whitespace checks passed.
+
+The template content, source audit, runnable checks, and protected practice support **Approved** canonical artifact state, with browser layout verification explicitly excluded above. The five exercises remain unattempted; no learner review date, learning-state advancement, or mastery claim was added.
 
 ## 2. Prerequisite bridge
 
