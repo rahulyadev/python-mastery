@@ -91,7 +91,7 @@ Expected reasoning: the slice creates an outer list; `append` changes the shared
 | Interview compatibility | Python 3.11 |
 | Initially tested runtime | CPython 3.14.7 and CPython 3.11.16; Linux x86_64, conventional GIL builds |
 | Last source audit | 2026-08-30 |
-| Artifact state | Draft |
+| Artifact state | Approved |
 
 ## 1. Learning outcome and evidence
 
@@ -122,6 +122,14 @@ python -B -m unittest discover -s units/built-in-types/PY-BLT-040-lists-tuples-r
 ```
 
 The Python artifacts need only the standard library. Node.js is additionally needed for the three explorer-model checks in [test_visual_model.py](tests/test_visual_model.py); without it they explicitly skip. Editing the visual requires running those checks, not accepting skips as verification.
+
+### Artifact verification — 2026-08-30
+
+Repository validation and all **30 tests** passed on CPython **3.14.7** and **3.11.16**, with no skips. Both example scripts and both experiment probes ran on each runtime. The stored experiment transcripts were compared with actual stdout and matched exactly. The test suite includes 9,100 comparisons between the explorer's JavaScript model and Python slicing; Node.js 24.19.0 was available for those checks.
+
+The browser review exercised the presets, lengths 0 and 12, an out-of-range length, zero step, unsafe integer input, and explicit `None`. Layouts were checked at 320, 360, and 736 pixels without horizontal overflow; no browser console errors were reported. The visual remains a bounded model, not a Python runtime.
+
+The source audit, runnable checks, complete template content, and protected practice justify **Approved** artifact state. No learner attempt, reconstruction, quiz, or delayed recall was recorded, so the learning state and review dates remain unchanged.
 
 ## 2. Prerequisite bridge
 
